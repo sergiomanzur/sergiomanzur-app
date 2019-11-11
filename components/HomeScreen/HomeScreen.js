@@ -13,6 +13,7 @@ class HomeScreen extends Component {
             currentPage: 1,
             totalPages: null,
             loading: true,
+            loadingNewPage: false
         }
     }
 
@@ -24,10 +25,11 @@ class HomeScreen extends Component {
         axios.get(`http://www.dev.sergiomanzur.com/api/pages/page${page}`)
             .then(res => {
                 this.setState({
-                    posts:res.data.data,
-                    currentPage: res.data['current_page'],
-                    totalPages:res.data['total_pages'],
-                    loading:false
+                    posts: [...this.state.posts, ...res.data.data],
+                    currentPage: res.data.current_page,
+                    totalPages:res.data.total_pages,
+                    loading:false,
+                    loadingNewPage: false
                 });
             })
     }
@@ -35,6 +37,14 @@ class HomeScreen extends Component {
     static navigationOptions = {
         headerTitle: () => <LogoTitle />,
     };
+
+    loadNextPage() {
+        console.log("get new data");
+        if(!this.state.loadingNewPage) {
+            this.setState({loadingNewPage: true});
+            this.getInformation(this.state.currentPage + 1);
+        }
+    }
 
 
 
@@ -46,7 +56,9 @@ class HomeScreen extends Component {
                 contentSize.height - paddingToBottom;
         };
 
-        const homePosts = this.state.posts.filter((x,i) => i < 6).map(
+        const homePosts = this.state.posts
+            //.filter((x,i) => i < 6)
+            .map(
             post => <Card key={post.id} title={post.title} image={{uri: "http://dev.sergiomanzur.com/site/assets/files/"+post.id+"/"+
                     post.images[0].data}}>
                 <Text style={{marginBottom: 10}}> {post.summary}</Text>
@@ -66,15 +78,16 @@ class HomeScreen extends Component {
         return (
             <ScrollView
                 style={styles.container}
-                onScroll={({nativeEvent}) => {
+                onMomentumScrollEnd={({nativeEvent}) => {
                     if (isCloseToBottom(nativeEvent)) {
-                        console.log("reached the bottom");
+                        this.loadNextPage()
                     }
                 }}
                 scrollEventThrottle={400}
             >
                 <Text h1 style={{textAlign: 'center', padding: 15}}>El Blog de Sergio Manzur</Text>
                 {this.state.loading ? <ActivityIndicator size={"large"} /> : homePosts}
+                {this.state.loadingNewPage ? <ActivityIndicator size={"large"} /> : <Text/>}
             </ScrollView>
         );
 
