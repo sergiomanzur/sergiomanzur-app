@@ -1,7 +1,7 @@
 import React from "react";
-import {StyleSheet, View, ScrollView, Image, Dimensions, ActivityIndicator} from "react-native";
+import {StyleSheet, ScrollView, Image, Dimensions, ActivityIndicator} from "react-native";
 import { WebView } from 'react-native-webview';
-import { Card, ListItem, Button, Icon, Text } from 'react-native-elements'
+import { Text } from 'react-native-elements'
 import axios from "axios";
 import LogoTitle from '../LogoTitle/LogoTitle';
 
@@ -113,9 +113,9 @@ class PostScreen extends React.Component {
                        `;
 
         const contentView = (<WebView
-            source={{ html: '<html><head><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>'+ content }}
+            source={{ html: '<html><head><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"></head>'+ content }}
             style={{ height: this.state.webViewHeight, width: Dimensions.get('window').width}}
-            /*style = {[this.props.style,{flex : 1,borderWidth: 1, height: '100%'}]}*/
+            javaScriptEnabled={true}
             onMessage={this.onWebViewMessage}
             injectedJavaScript={jsCode}
             scrollEnabled={false}
